@@ -81,7 +81,7 @@ struct ContentView: View {
                         }
                     }
 
-                    Button { picking = true } label: {
+                    Button { pickingFolder = false; picking = true } label: {
                         HStack {
                             Spacer()
                             if working { ProgressView().tint(.white) }
@@ -97,7 +97,7 @@ struct ContentView: View {
                     .foregroundStyle(.white)
 
                     if operation == .compress {
-                        Button("Выбрать папку") { pickingFolder = true }
+                        Button("Выбрать папку") { pickingFolder = true; picking = true }
                             .disabled(working)
                     }
 
@@ -111,14 +111,8 @@ struct ContentView: View {
             .navigationBarHidden(true)
         }
         .fileImporter(isPresented: $picking,
-                      allowedContentTypes: operation == .join ? [.data] : [.item, .folder],
-                      allowsMultipleSelection: operation == .join) { result in
-            switch result {
-            case .success(let urls): process(urls)
-            case .failure(let error): errorText = error.localizedDescription
-            }
-        }
-        .fileImporter(isPresented: $pickingFolder, allowedContentTypes: [.folder], allowsMultipleSelection: false) { result in
+                      allowedContentTypes: pickingFolder ? [.folder] : [.data],
+                      allowsMultipleSelection: !pickingFolder && operation == .join) { result in
             switch result {
             case .success(let urls): process(urls)
             case .failure(let error): errorText = error.localizedDescription
